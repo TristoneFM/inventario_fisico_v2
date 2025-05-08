@@ -59,13 +59,7 @@ export default function DashboardLayout({ children }) {
       icon: <AuditIcon />, 
       path: '/dashboard/auditar',
       permission: 'audit'
-    },
-    { 
-      text: 'Gráficas', 
-      icon: <BarChartIcon />, 
-      path: '/dashboard/graficas',
-      permission: 'capture'
-    },
+    }
   ];
 
   const drawer = (
