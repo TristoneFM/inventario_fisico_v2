@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import Image from 'next/image';
 import {
   Box,
   Drawer,
@@ -24,6 +25,7 @@ import {
   Search as AuditIcon,
   Logout as LogoutIcon,
   Dashboard,
+  BarChart as BarChartIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 
@@ -58,14 +60,35 @@ export default function DashboardLayout({ children }) {
       path: '/dashboard/auditar',
       permission: 'audit'
     },
+    { 
+      text: 'Gráficas', 
+      icon: <BarChartIcon />, 
+      path: '/dashboard/graficas',
+      permission: 'capture'
+    },
   ];
 
   const drawer = (
     <div>
-      <Toolbar>
-        <Typography variant="h6" noWrap component="div">
-          Inventario Físico
-        </Typography>
+      <Toolbar sx={{ display: 'flex', flexDirection: 'column', py: 2 }}>
+        <Box 
+          sx={{ 
+            width: 120, 
+            height: 120, 
+            position: 'relative',
+            mb: -5,
+            mt: -5
+          }}
+        >
+          <Image
+            src="/tristone.png"
+            alt="Tristone Logo"
+            fill
+            style={{ objectFit: 'contain' }}
+            priority
+          />
+        </Box>
+
       </Toolbar>
       <Divider />
       <List>

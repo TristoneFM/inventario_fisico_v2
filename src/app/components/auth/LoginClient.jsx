@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { 
   Box, 
   Paper, 
@@ -21,7 +22,6 @@ import { useAuth } from '@/app/context/AuthContext';
 import PersonIcon from '@mui/icons-material/Person';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import InventoryIcon from '@mui/icons-material/Inventory';
 
 export default function LoginClient() {
   const [employeeId, setEmployeeId] = useState('');
@@ -84,24 +84,26 @@ export default function LoginClient() {
               left: 0,
               right: 0,
               height: '4px',
-              background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+              background: `linear-gradient(90deg, ${theme.palette.primary.main}, #FFD700)`,
             }
           }}
         >
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 4 }}>
             <Box 
               sx={{ 
-                width: 60, 
-                height: 60, 
-                borderRadius: '50%', 
-                backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                mb: 2
+                width: 200, 
+                height: 200, 
+                position: 'relative',
+                mb: -5
               }}
             >
-              <InventoryIcon sx={{ fontSize: 32, color: theme.palette.primary.main }} />
+              <Image
+                src="/tristone.png"
+                alt="Tristone Logo"
+                fill
+                style={{ objectFit: 'contain' }}
+                priority
+              />
             </Box>
             <Typography variant="h4" component="h1" gutterBottom align="center" fontWeight="600">
               Inventario Físico

@@ -213,6 +213,7 @@ export default function BinSelectionClient() {
         onChange={handleSearchChange}
         onKeyDown={handleSearchKeyDown}
         inputRef={searchInputRef}
+
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
