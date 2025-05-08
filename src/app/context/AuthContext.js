@@ -73,9 +73,11 @@ export function AuthProvider({ children }) {
     return permissions.includes(permission);
   };
 
-  // Redirect to login if not authenticated and not already on login page
+  // Redirect to login if not authenticated and not already on login page or graficas page
   useEffect(() => {
-    if (!isLoading && !isAuthenticated && window.location.pathname !== '/login') {
+    if (!isLoading && !isAuthenticated && 
+        window.location.pathname !== '/login' && 
+        !window.location.pathname.startsWith('/graficas')) {
       router.push('/login');
     }
   }, [isLoading, isAuthenticated, router]);

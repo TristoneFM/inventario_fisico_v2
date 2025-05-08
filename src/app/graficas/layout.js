@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+
 import {
   Box,
   AppBar,
@@ -11,15 +11,9 @@ import {
   IconButton,
   useTheme,
 } from '@mui/material';
-import {
-  Menu as MenuIcon,
-  Logout as LogoutIcon,
-} from '@mui/icons-material';
-import { useAuth } from '../context/AuthContext';
 
 export default function GraphsLayout({ children }) {
-  const router = useRouter();
-  const { employeeId, logout } = useAuth();
+
   const theme = useTheme();
 
   return (
@@ -33,36 +27,8 @@ export default function GraphsLayout({ children }) {
             display: 'flex',
             alignItems: 'center'
           }}>
-            <img
-              src="/tristone.png"
-              alt="Tristone Logo"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain'
-              }}
-            />
           </Box>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Inventario Físico
-          </Typography>
-          <Typography variant="body1" sx={{ mr: 2 }}>
-            ID: {employeeId}
-          </Typography>
-          <Button
-            color="inherit"
-            onClick={() => router.push('/dashboard')}
-            sx={{ mr: 1 }}
-          >
-            Dashboard
-          </Button>
-          <IconButton
-            color="inherit"
-            onClick={logout}
-            edge="end"
-          >
-            <LogoutIcon />
-          </IconButton>
+   
         </Toolbar>
       </AppBar>
       <Box
