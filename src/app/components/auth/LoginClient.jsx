@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { 
   Box, 
   Paper, 
@@ -94,15 +93,18 @@ export default function LoginClient() {
                 width: 200, 
                 height: 200, 
                 position: 'relative',
-                mb: -5
+                mb: -5,
+                mt: -5
               }}
             >
-              <Image
+              <img
                 src="/tristone.png"
                 alt="Tristone Logo"
-                fill
-                style={{ objectFit: 'contain' }}
-                priority
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain'
+                }}
               />
             </Box>
             <Typography variant="h4" component="h1" gutterBottom align="center" fontWeight="600">
