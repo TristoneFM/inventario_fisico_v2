@@ -64,6 +64,32 @@ export async function POST(request) {
       ]
     );
 
+    // Check if rack exists in auditoria table
+    const auditoriaResult = await query(
+      'SELECT id_ubicacion FROM auditoria WHERE id_ubicacion = ?',
+      [rack]
+    );
+
+    if (auditoriaResult.length > 0) {
+      // Update existing record
+      await query(
+        'UPDATE auditoria SET estado_auditoria = 0 WHERE id_ubicacion = ?',
+        [rack]
+      );
+    } else {
+      // Insert new record
+      await query(
+        `INSERT INTO auditoria (
+          id_ubicacion,
+          ubicacion,
+          area_ubicacion,
+          emp_id,
+          estado_auditoria
+        ) VALUES (?, ?, ?, NULL, 0)`,
+        [rack, bin, area]
+      );
+    }
+
     return NextResponse.json({ 
       success: true,
       message: 'Capture inserted successfully',
