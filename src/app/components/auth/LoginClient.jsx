@@ -39,12 +39,21 @@ export default function LoginClient() {
     
     setIsLoading(true);
     setError('');
+
+    // if employeeId starts with 120 remove the first 3 digits and last 1 digit, if it start with 12 and third digit is diifernt than 0 than remove the first 2 digits and last 1 digit
+    let employeeIdFormatted = employeeId;
+    if (employeeId.startsWith('120')) {
+      employeeIdFormatted = employeeId.slice(3, -1);
+    } else if (employeeId.startsWith('12') && employeeId[2] !== '0') {
+      employeeIdFormatted = employeeId.slice(2, -1);
+    }
     
     try {
-      const result = await login(employeeId.trim());
+      const result = await login(employeeIdFormatted.trim());
       if (result.success) {
         router.push('/dashboard');
       } else {
+        setEmployeeId('');
         setError(result.error || 'Error al iniciar sesión');
       }
     } catch (err) {
