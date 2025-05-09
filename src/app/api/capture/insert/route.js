@@ -3,29 +3,19 @@ import { query } from '@/lib/db';
 
 export async function POST(request) {
   try {
-    const { 
-      serial, 
-      employeeId, 
-      bin, 
-      rack,
-      area,
-      material,
-      material_description,
-      stock,
-      serial_obsoleto
-    } = await request.json();
+    const { items } = await request.json();
 
-    if (!serial || !employeeId || !bin || !rack || !area || !material || !material_description || stock === undefined) {
+    if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'No items provided for insertion' },
         { status: 400 }
       );
     }
 
-    // Get employee name
+    // Get employee name for the first item (assuming all items have the same employeeId)
     const employeeResult = await query(
       'SELECT emp_nombre FROM empleados.del_empleados WHERE emp_id = ?',
-      [employeeId]
+      [items[0].employeeId]
     );
 
     if (employeeResult.length === 0) {
@@ -35,7 +25,22 @@ export async function POST(request) {
       );
     }
 
-    // Insert into captura table
+    // Prepare the bulk insert query
+    const placeholders = items.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)').join(',');
+    const values = items.flatMap(item => [
+      item.employeeId,
+      item.serial,
+      item.material,
+      item.material_description,
+      item.stock,
+      item.bin,
+      item.employeeId,
+      employeeResult[0].emp_nombre,
+      item.serial_obsoleto || 0,
+      item.rack
+    ]);
+
+    // Execute bulk insert
     const result = await query(
       `INSERT INTO captura (
         captura_grupo,
@@ -49,32 +54,21 @@ export async function POST(request) {
         fecha,
         serial_obsoleto,
         rack
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)`,
-      [
-        employeeId,
-        serial,
-        material,
-        material_description,
-        stock,
-        bin,
-        employeeId,
-        employeeResult[0].emp_nombre,
-        serial_obsoleto || 0,
-        rack
-      ]
+      ) VALUES ${placeholders}`,
+      values
     );
 
     // Check if rack exists in auditoria table
     const auditoriaResult = await query(
       'SELECT id_ubicacion FROM auditoria WHERE id_ubicacion = ?',
-      [rack]
+      [items[0].rack]
     );
 
     if (auditoriaResult.length > 0) {
       // Update existing record
       await query(
         'UPDATE auditoria SET estado_auditoria = 0 WHERE id_ubicacion = ?',
-        [rack]
+        [items[0].rack]
       );
     } else {
       // Insert new record
@@ -86,28 +80,22 @@ export async function POST(request) {
           emp_id,
           estado_auditoria
         ) VALUES (?, ?, ?, NULL, 0)`,
-        [rack, bin, area]
+        [items[0].rack, items[0].bin, items[0].area]
       );
     }
 
     return NextResponse.json({ 
       success: true,
-      message: 'Capture inserted successfully',
+      message: 'Captures inserted successfully',
       data: {
-        id: result.insertId,
-        serial,
-        material,
-        descripcion: material_description,
-        cantidad: stock,
-        ubicacion: bin,
-        rack
+        insertedCount: items.length
       }
     });
 
   } catch (error) {
-    console.error('Error inserting capture:', error);
+    console.error('Error inserting captures:', error);
     return NextResponse.json(
-      { error: 'Error inserting capture', details: error.message },
+      { error: 'Error inserting captures', details: error.message },
       { status: 500 }
     );
   }

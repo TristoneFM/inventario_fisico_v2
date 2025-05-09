@@ -359,31 +359,34 @@ export default function SerialCaptureClient() {
     setShowConfirmation(false);
 
     try {
-      // Insert all serials
-      for (const data of serialData) {
-        const response = await fetch('/api/capture/insert', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            serial: data.serial,
-            employeeId: employeeId,
-            bin: bin,
-            rack: rack,
-            area: area,
-            material: data.material,
-            material_description: data.material_description,
-            stock: data.stock,
-            serial_obsoleto: data.serial_obsoleto || 0  // Pass the flag to API
-          }),
-        });
+      // Prepare the data for bulk insert
+      const insertData = serialData.map(data => ({
+        serial: data.serial,
+        employeeId: employeeId,
+        bin: bin,
+        rack: rack,
+        area: area,
+        material: data.material,
+        material_description: data.material_description,
+        stock: data.stock,
+        serial_obsoleto: data.serial_obsoleto || 0
+      }));
 
-        const result = await response.json();
-        if (result.error) {
-          setShowError(true);
-          return;
-        }
+      // Send all data in a single request
+      const response = await fetch('/api/capture/insert', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          items: insertData
+        }),
+      });
+
+      const result = await response.json();
+      if (result.error) {
+        setShowError(true);
+        return;
       }
 
       setShowSuccess(true);
