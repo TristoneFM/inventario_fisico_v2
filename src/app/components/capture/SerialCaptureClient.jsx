@@ -671,12 +671,12 @@ export default function SerialCaptureClient() {
         <DialogTitle>Confirmar Captura</DialogTitle>
         <DialogContent>
           <Typography variant="body1" sx={{ mb: 2 }}>
-            Para confirmar que ha capturado todos los seriales correctamente, por favor ingrese la cantidad de seriales capturados:
+            Para confirmar que ha capturado todos los seriales correctamente, por favor ingrese la cantidad de cajas escaneadas:
           </Typography>
           <TextField
             autoFocus
             margin="dense"
-            label="Cantidad de Seriales"
+            label="Cantidad de Cajas"
             type="number"
             fullWidth
             variant="outlined"
