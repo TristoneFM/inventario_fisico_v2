@@ -23,12 +23,12 @@ const areaColorMap = [
     hoverColor: 'rgba(25, 118, 210, 0.4)',
   }, // Blue
   {
-    id: 'mp',
+    id: 'materia-prima',
     color: 'rgba(255, 153, 0, 0.50)',
     hoverColor: 'rgba(255, 152, 0, 0.4)',
   }, // Orange
   {
-    id: 'green',
+    id: 'extrusion',
     color: 'rgba(155, 39, 176, 0.50)',
     hoverColor: 'rgba(156, 39, 176, 0.4)',
   }, // Purple
