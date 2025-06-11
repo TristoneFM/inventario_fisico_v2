@@ -60,8 +60,9 @@ export default function AuditClient() {
     const fetchAuditoriaData = async () => {
       try {
         const response = await fetch('/api/auditoria');
+       
         const data = await response.json();
-
+        console.log(data);
         const areasMap = new Map();
         data.forEach((record) => {
           if (!areasMap.has(record.area_ubicacion)) {
