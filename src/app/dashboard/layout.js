@@ -74,12 +74,14 @@ export default function DashboardLayout({ children }) {
             mt: -5
           }}
         >
-          <Image
+          <img
             src="/tristone.png"
             alt="Tristone Logo"
-            fill
-            style={{ objectFit: 'contain' }}
-            priority
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain'
+            }}
           />
         </Box>
 
