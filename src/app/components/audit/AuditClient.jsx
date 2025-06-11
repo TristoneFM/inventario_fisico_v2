@@ -53,6 +53,10 @@ export default function AuditClient() {
   const router = useRouter();
 
   useEffect(() => {
+    // Reset states first
+    setAreas([]);
+    setRacks({});
+
     const fetchAuditoriaData = async () => {
       try {
         const response = await fetch('/api/auditoria');
