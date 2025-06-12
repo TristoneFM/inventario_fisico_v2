@@ -91,7 +91,16 @@ export default function AuditClient() {
       }
     };
 
+    // Fetch data immediately on component mount
     fetchAuditoriaData();
+    
+    // Set up interval to fetch data every 30 seconds
+    const intervalId = setInterval(() => {
+      fetchAuditoriaData();
+    }, 30000); // 30 seconds in milliseconds
+    
+    // Clean up interval on component unmount
+    return () => clearInterval(intervalId);
   }, []);
 
   const handleRackClick = (rackId) => {
