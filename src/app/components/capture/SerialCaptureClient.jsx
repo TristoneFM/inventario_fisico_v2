@@ -41,6 +41,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import WarningIcon from '@mui/icons-material/Warning';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { playSound } from '@/lib/soundUtils';
 
 // Area names for display
 const areaNames = {
@@ -170,6 +171,7 @@ export default function SerialCaptureClient() {
       if (serialInput.length === 10 || serialInput.length === 11 && (serialInput.startsWith('S') || serialInput.startsWith('M') || serialInput.startsWith('s') || serialInput.startsWith('m'))) {
         handleAddSerial();
       } else {
+        playSound('error');
         toast.error('Serial Incorrecto', {
           position: "top-right",
           autoClose: 1000,
@@ -206,6 +208,7 @@ export default function SerialCaptureClient() {
 
   const handleAddSerial = async () => {
     if (!employeeId) {
+      playSound('error');
       toast.error('No se encontró el ID del empleado', {
         position: "top-right",
         autoClose: 1000,
@@ -222,6 +225,7 @@ export default function SerialCaptureClient() {
       
       // Validate serial format
       if (!/^[SsMm].+/.test(serial)) {
+        playSound('error');
         toast.error('Serial Invalido', {
           position: "top-right",
           autoClose: 1000,
@@ -242,6 +246,7 @@ export default function SerialCaptureClient() {
 
       // Check if serial is already in the list (duplicate)
       if (serials.includes(cleanSerial)) {
+        playSound('error');
         toast.error(`El serial ${cleanSerial} ya ha sido capturado`, {
           position: "top-right",
           autoClose: 1000,
@@ -268,6 +273,7 @@ export default function SerialCaptureClient() {
         }
 
         if (data.isCaptured) {
+          playSound('error');
           toast.error(`El serial ${cleanSerial} ya ha sido capturado anteriormente`, {
             position: "top-right",
             autoClose: 1000,
@@ -296,6 +302,7 @@ export default function SerialCaptureClient() {
           setSerialInput('');
           
           // Show success message
+          playSound('success');
           toast.success(`Serial ${cleanSerial} agregado a la lista`, {
             position: "top-right",
             autoClose: 1000,
@@ -315,6 +322,7 @@ export default function SerialCaptureClient() {
           setShowObsoleteModal(true);
         }
       } catch (error) {
+        playSound('error');
         toast.error('Error al verificar el serial', {
           position: "top-right",
           autoClose: 1000,
@@ -470,6 +478,7 @@ export default function SerialCaptureClient() {
       }]);
 
       // Show success message
+      playSound('success');
       toast.success(`Serial ${selectedSerial.serial} agregado a la lista`, {
         position: "top-right",
         autoClose: 1000,

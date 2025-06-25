@@ -33,6 +33,7 @@ import { useAuth } from '@/app/context/AuthContext';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import CloseIcon from '@mui/icons-material/Close';
 import WarningIcon from '@mui/icons-material/Warning';
+import { playSound } from '@/lib/soundUtils';
 
 // Area names for display
 const areaNames = {
@@ -125,6 +126,7 @@ export default function SpecialCaptureClient() {
       
       // Validate serial format (must start with S and be 10-11 characters total)
       if (!serial.match(/^[Ss].{9,10}$/)) {
+        playSound('error');
         toast.error('Serial invalido');
         setSerialInput('');
         if (serialInputRef.current) {
@@ -153,6 +155,7 @@ export default function SpecialCaptureClient() {
         const captureData = await captureResponse.json();
 
         if (captureData.exists) {
+          playSound('error');
           toast.error('Este serial ya ha sido capturado');
           setSerialInput('');
           if (serialInputRef.current) {
@@ -167,6 +170,7 @@ export default function SpecialCaptureClient() {
         }
       } catch (error) {
         console.error('Error checking serial:', error);
+        playSound('error');
         toast.error('Error al verificar el serial');
       }
     }
@@ -183,6 +187,7 @@ export default function SpecialCaptureClient() {
       
       // Validate part number format (must start with P and be at least 2 characters)
       if (!partNumberValue.match(/^[Pp]./)) {
+        playSound('error');
         toast.error('Número de parte inválido');
         setPartNumber('');
         if (partNumberInputRef.current) {
@@ -200,6 +205,7 @@ export default function SpecialCaptureClient() {
         const data = await response.json();
 
         if (!data.success) {
+          playSound('error');
           toast.error('Número de parte no encontrado');
           setPartNumber('');
           if (partNumberInputRef.current) {
@@ -217,6 +223,7 @@ export default function SpecialCaptureClient() {
         }
       } catch (error) {
         console.error('Error checking part number:', error);
+        playSound('error');
         toast.error('Error al verificar el número de parte');
       }
     }
@@ -277,6 +284,7 @@ export default function SpecialCaptureClient() {
         const data = await response.json();
 
         if (data.exists) {
+          playSound('error');
           toast.error('Este serial ya ha sido capturado');
           // Clear all inputs
           setSerialInput('');
@@ -331,6 +339,7 @@ export default function SpecialCaptureClient() {
         setIsObsolete(false);
         
         // Show success message
+        playSound('success');
         toast.success(`Serial ${serialInput.trim()} capturado exitosamente`, {
           position: "top-right",
           autoClose: 1000,
@@ -346,6 +355,7 @@ export default function SpecialCaptureClient() {
         }
       } catch (error) {
         console.error('Error capturing serial:', error);
+        playSound('error');
         toast.error(error.message || 'Error al capturar el serial', {
           position: "top-right",
           autoClose: 1000,

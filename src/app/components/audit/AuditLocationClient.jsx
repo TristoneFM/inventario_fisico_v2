@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -20,11 +20,26 @@ import {
   DialogContentText,
   DialogActions,
   Button,
+  Breadcrumbs,
+  Link,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  IconButton,
+  Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Alert,
+  Snackbar,
 } from '@mui/material';
 import { Check as CheckIcon, CheckCircle as CheckCircleIcon } from '@mui/icons-material';
 import { useParams, useRouter } from 'next/navigation';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { playSound } from '@/lib/soundUtils';
 
 export default function AuditLocationClient() {
   const { id } = useParams();
@@ -49,6 +64,7 @@ export default function AuditLocationClient() {
     } catch (error) {
       console.error('Error fetching serials:', error);
       setLoading(false);
+      playSound('error');
       toast.error('Error al cargar los seriales');
     }
   }, [id]);
@@ -97,6 +113,7 @@ export default function AuditLocationClient() {
 
     const employeeId = localStorage.getItem('employeeId');
     if (!employeeId) {
+      playSound('error');
       toast.error('No hay usuario autenticado');
       return;
     }
@@ -106,6 +123,7 @@ export default function AuditLocationClient() {
     if (serial.length > 0) {
       // Validate serial format
       if (!validateSerial(serial)) {
+        playSound('error');
         toast.error('El serial debe comenzar con S, s, M o m');
         setTimeout(() => {
           setScannedSerial('');
@@ -145,6 +163,7 @@ export default function AuditLocationClient() {
           setEstadoAuditoria(statusData.estado_auditoria);
           
           // Show success message
+          playSound('success');
           toast.success('Serial auditado correctamente');
           
           // If audit is completed, show success modal
@@ -153,11 +172,13 @@ export default function AuditLocationClient() {
           }
         } else {
           // Show error message
+          playSound('error');
           toast.error(data.error || 'Error al auditar serial');
         }
       } catch (error) {
         console.log(error);
         console.error('Error updating audit status:', error);
+        playSound('error');
         toast.error('Error al auditar serial');
       }
       
