@@ -439,11 +439,27 @@ export default function SerialCaptureClient() {
 
         if (result.error) {
           setPartNumberError(result.error);
+          // Clear the input and play error sound
+          setPartNumber('');
+          playSound('error');
+          // Focus back to the part number input
+          if (partNumberInputRef.current) {
+            partNumberInputRef.current.focus();
+          }
         } else {
           setMaterialDescription(result.data.material_description);
+          // Play success sound when part number is valid
+          playSound('success');
         }
       } catch (error) {
         setPartNumberError('Error al verificar el número de parte');
+        // Clear the input and play error sound
+        setPartNumber('');
+        playSound('error');
+        // Focus back to the part number input
+        if (partNumberInputRef.current) {
+          partNumberInputRef.current.focus();
+        }
       }
     }
   };
