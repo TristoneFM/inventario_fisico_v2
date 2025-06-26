@@ -116,116 +116,155 @@ export default function SpecialCaptureClient() {
   }, [area]);
 
   const handleSerialChange = (event) => {
-    setSerialInput(event.target.value);
+    setSerialInput(event.target.value.toUpperCase());
+  };
+
+  const validateSerial = async () => {
+    const serial = serialInput.trim();
+    
+    // Only validate if there's a value
+    if (!serial) return;
+    
+    // Validate serial format (must start with S and be 10-11 characters total)
+    if (!serial.match(/^[Ss].{9,10}$/)) {
+      playSound('error');
+      toast.error('Serial invalido');
+      setSerialInput('');
+      if (serialInputRef.current) {
+        serialInputRef.current.focus();
+      }
+      return false;
+    }
+
+    try {
+      // Remove S prefix for API check
+      let serialWithoutS;
+      if (serial.startsWith('S') || serial.startsWith('s')) {
+         serialWithoutS = serial.substring(1);
+      } else {
+         serialWithoutS = serial;
+      }
+      
+      // Check if serial exists in material table
+      const materialResponse = await fetch(`/api/capture/check-serial?serial=${serialWithoutS}`);
+      const materialData = await materialResponse.json();
+
+      if (!materialData.exists) {
+        setCurrentSerial(serial);
+        setShowObsoleteModal(true);
+        setIsObsolete(true);
+        return false;
+      }
+
+      // Check if serial has already been captured
+      const captureResponse = await fetch(`/api/capture/special?serial=${serialWithoutS}`);
+      const captureData = await captureResponse.json();
+
+      if (captureData.exists) {
+        playSound('error');
+        toast.error('Este serial ya ha sido capturado');
+        setSerialInput('');
+        if (serialInputRef.current) {
+          serialInputRef.current.focus();
+        }
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error checking serial:', error);
+      playSound('error');
+      toast.error('Error al verificar el serial');
+      return false;
+    }
   };
 
   const handleSerialKeyDown = async (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-      const serial = serialInput.trim();
-      
-      // Validate serial format (must start with S and be 10-11 characters total)
-      if (!serial.match(/^[Ss].{9,10}$/)) {
-        playSound('error');
-        toast.error('Serial invalido');
-        setSerialInput('');
-        if (serialInputRef.current) {
-          serialInputRef.current.focus();
-        }
-        return;
-      }
-
-      try {
-        // Remove S prefix for API check
-        const serialWithoutS = serial.substring(1);
-        
-        // Check if serial exists in material table
-        const materialResponse = await fetch(`/api/capture/check-serial?serial=${serialWithoutS}`);
-        const materialData = await materialResponse.json();
-
-        if (!materialData.exists) {
-          setCurrentSerial(serial);
-          setShowObsoleteModal(true);
-          setIsObsolete(true);
-          return;
-        }
-
-        // Check if serial has already been captured
-        const captureResponse = await fetch(`/api/capture/special?serial=${serialWithoutS}`);
-        const captureData = await captureResponse.json();
-
-        if (captureData.exists) {
-          playSound('error');
-          toast.error('Este serial ya ha sido capturado');
-          setSerialInput('');
-          if (serialInputRef.current) {
-            serialInputRef.current.focus();
-          }
-          return;
-        }
-
-        // Focus the part number input when Enter is pressed in serial field
-        if (partNumberInputRef.current) {
-          partNumberInputRef.current.focus();
-        }
-      } catch (error) {
-        console.error('Error checking serial:', error);
-        playSound('error');
-        toast.error('Error al verificar el serial');
+      const isValid = await validateSerial();
+      if (isValid && partNumberInputRef.current) {
+        partNumberInputRef.current.focus();
       }
     }
   };
 
+  const handleSerialBlur = async () => {
+    const isValid = await validateSerial();
+    if (isValid && partNumberInputRef.current) {
+      partNumberInputRef.current.focus();
+    }
+  };
+
   const handlePartNumberChange = (event) => {
-    setPartNumber(event.target.value);
+    setPartNumber(event.target.value.toUpperCase());
+  };
+
+  const validatePartNumber = async () => {
+    const partNumberValue = partNumber.trim();
+    
+    // Only validate if there's a value
+    if (!partNumberValue) return;
+    
+    // Validate part number format (must start with P and be at least 2 characters)
+    if (!partNumberValue.match(/^[Pp]./)) {
+      playSound('error');
+      toast.error('Número de parte inválido');
+      setPartNumber('');
+      if (partNumberInputRef.current) {
+        partNumberInputRef.current.focus();
+      }
+      return false;
+    }
+
+    try {
+      // Remove P prefix for API 
+      let partNumberWithoutP;
+      if (partNumberValue.startsWith('P') || partNumberValue.startsWith('p')) {
+        partNumberWithoutP = partNumberValue.substring(1);
+      } else {
+        partNumberWithoutP = partNumberValue;
+      }
+      
+      // Check if part number exists
+      const response = await fetch(`/api/capture/check-part-number?partNumber=${partNumberWithoutP}`);
+      const data = await response.json();
+
+      if (!data.success) {
+        playSound('error');
+        toast.error('Número de parte no encontrado');
+        setPartNumber('');
+        if (partNumberInputRef.current) {
+          partNumberInputRef.current.focus();
+        }
+        return false;
+      }
+
+      // Store the material description
+      setMaterialDescription(data.data.material_description);
+      return true;
+    } catch (error) {
+      console.error('Error checking part number:', error);
+      playSound('error');
+      toast.error('Error al verificar el número de parte');
+      return false;
+    }
   };
 
   const handlePartNumberKeyDown = async (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-      const partNumberValue = partNumber.trim();
-      
-      // Validate part number format (must start with P and be at least 2 characters)
-      if (!partNumberValue.match(/^[Pp]./)) {
-        playSound('error');
-        toast.error('Número de parte inválido');
-        setPartNumber('');
-        if (partNumberInputRef.current) {
-          partNumberInputRef.current.focus();
-        }
-        return;
+      const isValid = await validatePartNumber();
+      if (isValid && quantityInputRef.current) {
+        quantityInputRef.current.focus();
       }
+    }
+  };
 
-      try {
-        // Remove P prefix for API check
-        const partNumberWithoutP = partNumberValue.substring(1);
-        
-        // Check if part number exists
-        const response = await fetch(`/api/capture/check-part-number?partNumber=${partNumberWithoutP}`);
-        const data = await response.json();
-
-        if (!data.success) {
-          playSound('error');
-          toast.error('Número de parte no encontrado');
-          setPartNumber('');
-          if (partNumberInputRef.current) {
-            partNumberInputRef.current.focus();
-          }
-          return;
-        }
-
-        // Store the material description
-        setMaterialDescription(data.data.material_description);
-
-        // Focus the quantity input when Enter is pressed in part number field
-        if (quantityInputRef.current) {
-          quantityInputRef.current.focus();
-        }
-      } catch (error) {
-        console.error('Error checking part number:', error);
-        playSound('error');
-        toast.error('Error al verificar el número de parte');
-      }
+  const handlePartNumberBlur = async () => {
+    const isValid = await validatePartNumber();
+    if (isValid && quantityInputRef.current) {
+      quantityInputRef.current.focus();
     }
   };
 
@@ -436,6 +475,7 @@ export default function SpecialCaptureClient() {
               value={serialInput}
               onChange={handleSerialChange}
               onKeyDown={handleSerialKeyDown}
+              onBlur={handleSerialBlur}
               inputRef={serialInputRef}
               sx={{ mb: 2 }}
             />
@@ -447,6 +487,7 @@ export default function SpecialCaptureClient() {
               value={partNumber}
               onChange={handlePartNumberChange}
               onKeyDown={handlePartNumberKeyDown}
+              onBlur={handlePartNumberBlur}
               inputRef={partNumberInputRef}
               sx={{ mb: 2 }}
             />
