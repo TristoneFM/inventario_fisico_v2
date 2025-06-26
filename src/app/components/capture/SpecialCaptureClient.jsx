@@ -322,6 +322,7 @@ export default function SpecialCaptureClient() {
       // Verify that confirm quantity matches quantity
       if (parseInt(confirmQuantity) !== parseInt(quantity)) {
         setConfirmQuantityError(true);
+        playSound('error');
         return;
       }
 
