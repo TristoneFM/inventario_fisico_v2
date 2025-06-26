@@ -85,6 +85,7 @@ export default function SpecialCaptureClient() {
   const [currentSerial, setCurrentSerial] = useState('');
   const [isObsolete, setIsObsolete] = useState(false);
   const [materialDescription, setMaterialDescription] = useState('');
+  const [serialValidatedByEnter, setSerialValidatedByEnter] = useState(false);
   
   // Refs for auto-focusing inputs
   const serialInputRef = useRef(null);
@@ -153,6 +154,7 @@ export default function SpecialCaptureClient() {
         setCurrentSerial(serial);
         setShowObsoleteModal(true);
         setIsObsolete(true);
+        playSound('error');
         return false;
       }
 
@@ -182,14 +184,21 @@ export default function SpecialCaptureClient() {
   const handleSerialKeyDown = async (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
+      setSerialValidatedByEnter(true);
       const isValid = await validateSerial();
       if (isValid && partNumberInputRef.current) {
         partNumberInputRef.current.focus();
       }
+      // Reset the flag after a short delay
+      setTimeout(() => setSerialValidatedByEnter(false), 100);
     }
   };
 
   const handleSerialBlur = async () => {
+    // Skip validation if it was already triggered by Enter key
+    if (serialValidatedByEnter) {
+      return;
+    }
     const isValid = await validateSerial();
     if (isValid && partNumberInputRef.current) {
       partNumberInputRef.current.focus();
@@ -296,11 +305,15 @@ export default function SpecialCaptureClient() {
 
   const handleObsoleteClose = () => {
     setShowObsoleteModal(false);
+    // Set flag to prevent blur validation when focusing part number input
+    setSerialValidatedByEnter(true);
     // Add a small delay to ensure modal is closed before focusing
     setTimeout(() => {
       if (partNumberInputRef.current) {
         partNumberInputRef.current.focus();
       }
+      // Reset the flag after focusing
+      setTimeout(() => setSerialValidatedByEnter(false), 50);
     }, 100);
   };
 
