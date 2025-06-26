@@ -123,6 +123,11 @@ export default function SerialCaptureClient() {
   const [partNumberError, setPartNumberError] = useState('');
   const [materialDescription, setMaterialDescription] = useState('');
   
+  // Quantity confirmation for obsolete modal
+  const [quantityConfirmation, setQuantityConfirmation] = useState('');
+  const [quantityConfirmationError, setQuantityConfirmationError] = useState(false);
+  const quantityConfirmationRef = useRef(null);
+  
   // Show delete confirmation
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [serialToDelete, setSerialToDelete] = useState(null);
@@ -189,6 +194,8 @@ export default function SerialCaptureClient() {
     setQuantity('');
     setPartNumberError('');
     setMaterialDescription('');
+    setQuantityConfirmation('');
+    setQuantityConfirmationError(false);
     // Focus the serial input after closing all modals
     if (serialInputRef.current) {
       serialInputRef.current.focus();
@@ -362,10 +369,12 @@ export default function SerialCaptureClient() {
     const enteredQuantity = parseInt(quantityVerification);
     if (enteredQuantity !== serials.length) {
       setQuantityError(true);
+      playSound('error');
       return;
     }
     setQuantityError(false);
     setShowConfirmation(false);
+    playSound('success');
 
     try {
       // Prepare the data for bulk insert
@@ -481,6 +490,15 @@ export default function SerialCaptureClient() {
 
   const handleModalSave = () => {
     if (partNumber && quantity && !partNumberError) {
+      // Check if quantity confirmation matches
+      if (parseInt(quantityConfirmation) !== parseInt(quantity)) {
+        setQuantityConfirmationError(true);
+        playSound('error');
+        return;
+      }
+      
+      setQuantityConfirmationError(false);
+      
       // Add to serials list
       setSerials([...serials, selectedSerial.serial]);
       setNewSerials([...newSerials, selectedSerial.serial]);
@@ -515,6 +533,21 @@ export default function SerialCaptureClient() {
     const cleanValue = quantity.replace(/[Qq]/, '');
     setQuantity(cleanValue);
     if (event.key === 'Enter' && partNumber && quantity) {
+      event.preventDefault();
+      // Focus the quantity confirmation input when Enter is pressed in quantity field
+      if (quantityConfirmationRef.current) {
+        quantityConfirmationRef.current.focus();
+      }
+    }
+  };
+
+  const handleQuantityConfirmationChange = (e) => {
+    setQuantityConfirmation(e.target.value);
+    setQuantityConfirmationError(false);
+  };
+
+  const handleQuantityConfirmationKeyDown = (event) => {
+    if (event.key === 'Enter' && partNumber && quantity && quantityConfirmation) {
       event.preventDefault();
       handleModalSave();
     }
@@ -881,6 +914,19 @@ export default function SerialCaptureClient() {
             onChange={(e) => setQuantity(e.target.value)}
             onKeyDown={handleQuantityKeyDown}
             inputRef={quantityInputRef}
+            sx={{ mb: 2 }}
+          />
+          
+          <TextField
+            fullWidth
+            label="Confirmar Cantidad"
+            type="number"
+            value={quantityConfirmation}
+            onChange={handleQuantityConfirmationChange}
+            onKeyDown={handleQuantityConfirmationKeyDown}
+            inputRef={quantityConfirmationRef}
+            error={quantityConfirmationError}
+            helperText={quantityConfirmationError ? "La cantidad de confirmación no coincide" : ""}
             sx={{ mb: 3 }}
           />
           
@@ -889,7 +935,7 @@ export default function SerialCaptureClient() {
             <Button 
               variant="contained" 
               onClick={handleModalSave}
-              disabled={!partNumber || !quantity || !!partNumberError}
+              disabled={!partNumber || !quantity || !quantityConfirmation || !!partNumberError}
             >
               Guardar
             </Button>
