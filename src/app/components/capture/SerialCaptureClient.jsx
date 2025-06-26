@@ -319,6 +319,7 @@ export default function SerialCaptureClient() {
         } else {
           // If serial doesn't exist in material table, show the obsolete modal first
           setSelectedSerial({ serial: cleanSerial });
+          playSound('error');
           setShowObsoleteModal(true);
         }
       } catch (error) {
