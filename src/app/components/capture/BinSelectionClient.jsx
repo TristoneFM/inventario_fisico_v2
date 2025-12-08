@@ -48,10 +48,11 @@ const areaColors = {
 };
 
 export default function BinSelectionClient() {
-  const { area, rack } = useParams();
+  const { planta, area, rack } = useParams();
   const router = useRouter();
   const areaName = areaNames[area] || 'Área';
   const areaColor = areaColors[area] || areaColors['terminado'];
+  const decodedPlanta = decodeURIComponent(planta);
   
   const [bins, setBins] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -67,7 +68,7 @@ export default function BinSelectionClient() {
     const fetchBins = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/bins?area=${area}&rack=${rack}`);
+        const response = await fetch(`/api/bins?planta=${encodeURIComponent(planta)}&area=${area}&rack=${rack}`);
         const data = await response.json();
 
         if (!response.ok) {
@@ -85,7 +86,7 @@ export default function BinSelectionClient() {
     };
 
     fetchBins();
-  }, [area, rack]);
+  }, [planta, area, rack]);
 
   // Focus search input when component mounts
   useEffect(() => {
@@ -119,9 +120,9 @@ export default function BinSelectionClient() {
       if (exactMatch) {
         console.log('Found exact match:', exactMatch);
         if (area === 'extrusion' || area === 'vulcanizado') {
-          router.push(`/dashboard/capture/${area}/${rack}/${exactMatch.id}/special-capture`);
+          router.push(`/dashboard/capture/${encodeURIComponent(planta)}/${area}/${rack}/${exactMatch.id}/special-capture`);
         } else {
-          router.push(`/dashboard/capture/${area}/${rack}/${exactMatch.id}`);
+          router.push(`/dashboard/capture/${encodeURIComponent(planta)}/${area}/${rack}/${exactMatch.id}`);
         }
         return;
       }
@@ -134,9 +135,9 @@ export default function BinSelectionClient() {
       if (partialMatch) {
         console.log('Found partial match:', partialMatch);
         if (area === 'extrusion' || area === 'vulcanizado') {
-          router.push(`/dashboard/capture/${area}/${rack}/${partialMatch.id}/special-capture`);
+          router.push(`/dashboard/capture/${encodeURIComponent(planta)}/${area}/${rack}/${partialMatch.id}/special-capture`);
         } else {
-          router.push(`/dashboard/capture/${area}/${rack}/${partialMatch.id}`);
+          router.push(`/dashboard/capture/${encodeURIComponent(planta)}/${area}/${rack}/${partialMatch.id}`);
         }
         return;
       }
@@ -148,9 +149,9 @@ export default function BinSelectionClient() {
 
   const handleBinClick = (binId) => {
     if (area === 'extrusion' || area === 'vulcanizado') {
-      router.push(`/dashboard/capture/${area}/${rack}/${binId}/special-capture`);
+      router.push(`/dashboard/capture/${encodeURIComponent(planta)}/${area}/${rack}/${binId}/special-capture`);
     } else {
-      router.push(`/dashboard/capture/${area}/${rack}/${binId}`);
+      router.push(`/dashboard/capture/${encodeURIComponent(planta)}/${area}/${rack}/${binId}`);
     }
   };
 
@@ -182,12 +183,20 @@ export default function BinSelectionClient() {
           onClick={() => router.push('/dashboard/capture')}
           sx={{ textDecoration: 'none' }}
         >
-          Capturar
+          Plantas
         </Link>
         <Link
           component="button"
           variant="body1"
-          onClick={() => router.push(`/dashboard/capture/${area}`)}
+          onClick={() => router.push(`/dashboard/capture/${encodeURIComponent(planta)}`)}
+          sx={{ textDecoration: 'none' }}
+        >
+          {decodedPlanta}
+        </Link>
+        <Link
+          component="button"
+          variant="body1"
+          onClick={() => router.push(`/dashboard/capture/${encodeURIComponent(planta)}/${area}`)}
           sx={{ textDecoration: 'none' }}
         >
           {areaName}

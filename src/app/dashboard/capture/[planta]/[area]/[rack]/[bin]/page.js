@@ -2,4 +2,4 @@ import SerialCaptureClient from '@/app/components/capture/SerialCaptureClient.js
 
 export default function SerialCapturePage() {
   return <SerialCaptureClient />;
-} 
+}

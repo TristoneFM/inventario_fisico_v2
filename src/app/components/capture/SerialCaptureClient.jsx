@@ -83,11 +83,12 @@ const mockSerialDatabase = [
 ];
 
 export default function SerialCaptureClient() {
-  const { area, rack, bin } = useParams();
+  const { planta, area, rack, bin } = useParams();
   const router = useRouter();
   const { employeeId } = useAuth();
   const areaName = areaNames[area] || 'Área';
   const areaColor = areaColors[area] || areaColors['terminado'];
+  const decodedPlanta = decodeURIComponent(planta);
   
   const [serials, setSerials] = useState([]);
   const [serialInput, setSerialInput] = useState('');
@@ -384,6 +385,7 @@ export default function SerialCaptureClient() {
         bin: bin,
         rack: rack,
         area: area,
+        planta: planta,
         material: data.material,
         material_description: data.material_description,
         stock: data.stock,
@@ -426,7 +428,7 @@ export default function SerialCaptureClient() {
 
   const handleSuccessClose = () => {
     setShowSuccess(false);
-    router.push(`/dashboard/capture/${area}/${rack}`);
+    router.push(`/dashboard/capture/${encodeURIComponent(planta)}/${area}/${rack}`);
   };
 
   const handlePartNumberChange = (e) => {
@@ -609,12 +611,20 @@ export default function SerialCaptureClient() {
           onClick={() => router.push('/dashboard/capture')}
           sx={{ textDecoration: 'none' }}
         >
-          Capturar
+          Plantas
         </Link>
         <Link
           component="button"
           variant="body1"
-          onClick={() => router.push(`/dashboard/capture/${area}`)}
+          onClick={() => router.push(`/dashboard/capture/${encodeURIComponent(planta)}`)}
+          sx={{ textDecoration: 'none' }}
+        >
+          {decodedPlanta}
+        </Link>
+        <Link
+          component="button"
+          variant="body1"
+          onClick={() => router.push(`/dashboard/capture/${encodeURIComponent(planta)}/${area}`)}
           sx={{ textDecoration: 'none' }}
         >
           {areaName}
@@ -622,7 +632,7 @@ export default function SerialCaptureClient() {
         <Link
           component="button"
           variant="body1"
-          onClick={() => router.push(`/dashboard/capture/${area}/${rack}`)}
+          onClick={() => router.push(`/dashboard/capture/${encodeURIComponent(planta)}/${area}/${rack}`)}
           sx={{ textDecoration: 'none' }}
         >
           Rack {rack}

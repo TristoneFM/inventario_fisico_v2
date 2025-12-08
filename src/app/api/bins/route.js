@@ -8,10 +8,18 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const area = searchParams.get('area');
     const rack = searchParams.get('rack');
+    const planta = searchParams.get('planta');
 
     if (!area || !rack) {
       return NextResponse.json(
         { error: 'Area and rack parameters are required' },
+        { status: 400 }
+      );
+    }
+
+    if (!planta) {
+      return NextResponse.json(
+        { error: 'Planta parameter is required' },
         { status: 400 }
       );
     }
@@ -24,13 +32,13 @@ export async function GET(request) {
       storageLocation = 'green';
     }
 
-    // Fetch distinct storage_bins for the specified area and rack
+    // Fetch distinct storage_bins for the specified planta, area and rack
     const bins = await query(
       `SELECT DISTINCT storage_bin as id, storage_bin as name 
        FROM ubicaciones_conteo 
-       WHERE storage_location = ? AND rack = ? 
+       WHERE planta = ? AND storage_location = ? AND rack = ? 
        ORDER BY storage_bin`,
-      [storageLocation, rack]
+      [planta, storageLocation, rack]
     );
 
     return NextResponse.json({ bins });

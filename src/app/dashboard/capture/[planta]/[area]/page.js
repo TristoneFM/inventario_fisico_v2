@@ -1,5 +1,5 @@
 import RackSelectionClient from '@/app/components/capture/RackSelectionClient.jsx';
 
-export default function AreaSelectionPage() {
+export default function RackSelectionPage() {
   return <RackSelectionClient />;
-} 
+}

@@ -66,10 +66,11 @@ const areaColors = {
 const RACKS_PER_PAGE = 24;
 
 export default function RackSelectionClient() {
-  const { area } = useParams();
+  const { planta, area } = useParams();
   const router = useRouter();
   const areaName = areaNames[area] || 'Área';
   const areaColor = areaColors[area] || areaColors['terminado'];
+  const decodedPlanta = decodeURIComponent(planta);
   
   const [racks, setRacks] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -85,7 +86,7 @@ export default function RackSelectionClient() {
     const fetchRacks = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/racks?area=${area}`);
+        const response = await fetch(`/api/racks?planta=${encodeURIComponent(planta)}&area=${area}`);
         const data = await response.json();
 
         if (!response.ok) {
@@ -103,7 +104,7 @@ export default function RackSelectionClient() {
     };
 
     fetchRacks();
-  }, [area]);
+  }, [planta, area]);
 
   // Focus search input when component mounts
   useEffect(() => {
@@ -136,7 +137,7 @@ export default function RackSelectionClient() {
       
       if (exactMatch) {
         console.log('Found exact match:', exactMatch);
-        router.push(`/dashboard/capture/${area}/${exactMatch.id}`);
+        router.push(`/dashboard/capture/${encodeURIComponent(planta)}/${area}/${exactMatch.id}`);
         return;
       }
       
@@ -147,7 +148,7 @@ export default function RackSelectionClient() {
       
       if (partialMatch) {
         console.log('Found partial match:', partialMatch);
-        router.push(`/dashboard/capture/${area}/${partialMatch.id}`);
+        router.push(`/dashboard/capture/${encodeURIComponent(planta)}/${area}/${partialMatch.id}`);
         return;
       }
       
@@ -157,7 +158,7 @@ export default function RackSelectionClient() {
   };
 
   const handleRackClick = (rackId) => {
-    router.push(`/dashboard/capture/${area}/${rackId}`);
+    router.push(`/dashboard/capture/${encodeURIComponent(planta)}/${area}/${rackId}`);
   };
 
   const filteredRacks = racks.filter(rack =>
@@ -188,7 +189,15 @@ export default function RackSelectionClient() {
           onClick={() => router.push('/dashboard/capture')}
           sx={{ textDecoration: 'none' }}
         >
-          Capturar
+          Plantas
+        </Link>
+        <Link
+          component="button"
+          variant="body1"
+          onClick={() => router.push(`/dashboard/capture/${encodeURIComponent(planta)}`)}
+          sx={{ textDecoration: 'none' }}
+        >
+          {decodedPlanta}
         </Link>
         <Typography color="text.primary">{areaName}</Typography>
       </Breadcrumbs>

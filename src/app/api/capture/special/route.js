@@ -15,11 +15,12 @@ export async function POST(request) {
       rack,
       bin,
       employeeId,
-      isObsolete
+      isObsolete,
+      planta
     } = await request.json();
 
     // Validate required fields
-    if (!serial || !partNumber || !quantity || !area || !rack || !bin || !employeeId) {
+    if (!serial || !partNumber || !quantity || !area || !rack || !bin || !employeeId || !planta) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -52,8 +53,9 @@ export async function POST(request) {
         emp_nombre,
         fecha,
         serial_obsoleto,
-        rack
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)`,
+        rack,
+        planta
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?)`,
       [
         employeeId,
         serial,
@@ -64,7 +66,8 @@ export async function POST(request) {
         employeeId,
         employeeResult[0].emp_nombre,
         isObsolete ? 1 : 0,
-        rack
+        rack,
+        planta
       ]
     );
 

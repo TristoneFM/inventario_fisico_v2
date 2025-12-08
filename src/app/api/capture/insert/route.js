@@ -28,7 +28,7 @@ export async function POST(request) {
     }
 
     // Prepare the bulk insert query
-    const placeholders = items.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)').join(',');
+    const placeholders = items.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?)').join(',');
     const values = items.flatMap(item => [
       item.employeeId,
       item.serial,
@@ -39,11 +39,12 @@ export async function POST(request) {
       item.employeeId,
       employeeResult[0].emp_nombre,
       item.serial_obsoleto || 0,
-      item.rack
+      item.rack,
+      item.planta
     ]);
 
     // Execute bulk insert
-    const result = await query(
+    await query(
       `INSERT INTO captura (
         captura_grupo,
         serial,
@@ -55,7 +56,8 @@ export async function POST(request) {
         emp_nombre,
         fecha,
         serial_obsoleto,
-        rack
+        rack,
+        planta
       ) VALUES ${placeholders}`,
       values
     );
