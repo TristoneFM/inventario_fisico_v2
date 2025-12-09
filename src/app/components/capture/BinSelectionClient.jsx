@@ -119,7 +119,7 @@ export default function BinSelectionClient() {
       
       if (exactMatch) {
         console.log('Found exact match:', exactMatch);
-        if (area === 'extrusion' || area === 'vulcanizado') {
+        if (area === 'extrusion' || area === 'vulcanizado' || area === 'subensamble') {
           router.push(`/dashboard/capture/${encodeURIComponent(planta)}/${area}/${rack}/${exactMatch.id}/special-capture`);
         } else {
           router.push(`/dashboard/capture/${encodeURIComponent(planta)}/${area}/${rack}/${exactMatch.id}`);
@@ -134,7 +134,7 @@ export default function BinSelectionClient() {
       
       if (partialMatch) {
         console.log('Found partial match:', partialMatch);
-        if (area === 'extrusion' || area === 'vulcanizado') {
+        if (area === 'extrusion' || area === 'vulcanizado' || area === 'subensamble') {
           router.push(`/dashboard/capture/${encodeURIComponent(planta)}/${area}/${rack}/${partialMatch.id}/special-capture`);
         } else {
           router.push(`/dashboard/capture/${encodeURIComponent(planta)}/${area}/${rack}/${partialMatch.id}`);
@@ -148,7 +148,7 @@ export default function BinSelectionClient() {
   };
 
   const handleBinClick = (binId) => {
-    if (area === 'extrusion' || area === 'vulcanizado') {
+    if (area === 'extrusion' || area === 'vulcanizado' || area === 'subensamble') {
       router.push(`/dashboard/capture/${encodeURIComponent(planta)}/${area}/${rack}/${binId}/special-capture`);
     } else {
       router.push(`/dashboard/capture/${encodeURIComponent(planta)}/${area}/${rack}/${binId}`);
